@@ -4,19 +4,29 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import math
+import sys
 import pandas as pd
 
-OUTPUT_INDEX = 10
-ATTRIBUTE_BEGIN = 0
-ATTRIBUTE_END = 9
+sys.setrecursionlimit(10**6)
 
-df = pd.read_csv("./Admission.csv")
+OUTPUT_INDEX = 0
+ATTRIBUTE_BEGIN = 1
+ATTRIBUTE_END = 7
+DATA_END = 351
+
+import pandas as pd
+
+dataset = pd.read_csv('./Admission.csv')
+X = dataset.iloc[:351, :].values
+print(X)
+
 
 class Node:
     def __init__(self):
-        value = None
-        attribute = None
-        leaves = None
+        self.value = None
+        self.attribute = None
+        self.leaves = []
+
 
 def sum_dict(my_dict):
    sum_ = 0
@@ -34,7 +44,8 @@ def calc_entropy(value_dict):
     entropy = 0
     for item in value_dict:
         pi = value_dict[item] / sum_values
-        entropy -= (pi * math.log2(pi))
+        if pi != 0:
+            entropy -= (pi * math.log(pi, 2.0))
 
     #return entropy
     return entropy
@@ -68,9 +79,9 @@ def calc_info_gain(data, attribute_index):
 
 def build_tree(data, curr_node, depth):
     classifications = count_values(data, OUTPUT_INDEX)
-    if count_values['no'] == 0:
+    if classifications[0] == 0:
         curr_node.value = 'Yes'
-    elif count_values['yes'] == 0:
+    elif classifications[1] == 0:
         curr_node.value = 'No'
     else:
         #find best attribute A
@@ -99,4 +110,9 @@ def print_tree(node, depth, attribute):
         print_tree(child, depth + 1, node.attribute)
     print(str(depth) + ": " + attribute + "=" + node.value)
 
-print_tree(build_tree(data, Node(), 1)) #FIXME
+def calculate():
+    root = build_tree(X, Node(), 1)
+    root.decision = 'Start'
+    print_tree(build_tree(X, Node(), 1), 1, "Head")
+
+calculate()
